@@ -1,4 +1,4 @@
-# paper-translate
+# Yakusha: claude-research-translator
 
 **Claude Code skill** — 英語論文（PDF）を日本語に翻訳・要約し、図版付きで出力する。
 
