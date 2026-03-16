@@ -92,30 +92,6 @@ Launch Claude Code and run `/paper-translate`:
 | TeX engine | lualatex (recommended) or xelatex |
 | Japanese font | Yu Gothic (Win) / Hiragino (Mac) / Noto CJK (Linux) |
 
-## :bulb: Example Output
-
-Processed from [Nukabot: Design of Care for Human-Microbe Relationships (CHI '21)](https://doi.org/10.1145/3411763.3451605):
-
-**paper.ja.md (excerpt)**
-
-```markdown
-## 1 INTRODUCTION AND BACKGROUND
-
-ヒューマン・コンピュータ・インタラクション（HCI）研究者たちは...
-
-![Figure 1: Nukadoko fermentation involving human, veg-](images/figure_1.jpeg)
-```
-
-**paper.summary.ja.md**
-
-```markdown
-# Nukabot: Design of Care for Human-Microbe Relationships — 要約
-
-## 一言まとめ
-日本の伝統的な発酵食品「糠床」を音声対話付きのスマート桶「Nukabot」に進化させ、
-人間と微生物の間に情動的・倫理的関係を育むHCIデザインを提案・評価した研究。
-```
-
 ## :building_construction: How It Works
 
 1. **Step 0** — PDFファイルの特定と出力フォルダの作成
