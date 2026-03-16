@@ -76,14 +76,18 @@ PDFに含まれる図表画像を抽出し、Markdownから参照できるよう
 ```python
 import fitz
 import os
+import json
 
 doc = fitz.open("<PDFパス>")
 output_dir = "<出力フォルダ>/images"
 os.makedirs(output_dir, exist_ok=True)
 
 img_counter = 1
+img_meta = {}  # filename -> { width_pct, page }
+
 for page_num in range(len(doc)):
     page = doc[page_num]
+    page_width = page.rect.width
     images = page.get_images(full=True)
     for img in images:
         xref = img[0]
@@ -93,9 +97,25 @@ for page_num in range(len(doc)):
         filename = f"figure_{img_counter}.{ext}"
         with open(os.path.join(output_dir, filename), "wb") as f:
             f.write(img_data)
-        print(f"Page {page_num+1}: {filename} ({base_image['width']}x{base_image['height']})")
+
+        # 画像の表示幅を計算（ページ幅に対する割合）
+        img_rects = page.get_image_rects(xref)
+        if img_rects:
+            display_width = img_rects[0].width
+            width_pct = round(display_width / page_width * 100)
+            width_pct = max(20, min(width_pct, 100))  # 20%〜100% にクランプ
+        else:
+            width_pct = 80  # 取得できない場合のデフォルト
+
+        img_meta[filename] = {"width_pct": width_pct, "page": page_num + 1}
+        print(f"Page {page_num+1}: {filename} ({base_image['width']}x{base_image['height']}, display: {width_pct}%)")
         img_counter += 1
+
 doc.close()
+
+# メタデータを保存（後のステップで参照）
+with open(os.path.join(output_dir, "meta.json"), "w") as f:
+    json.dump(img_meta, f, indent=2)
 ```
 
 #### 画像とFigureの対応付け
@@ -104,6 +124,7 @@ doc.close()
 2. PDFのテキストを読み、各 `Figure N:` キャプションがどのページにあるかを特定する。
 3. ページ番号を基に、抽出画像と Figure 番号を対応付ける。
 4. 対応表を記録しておく（例: `figure_1.jpeg` → Figure 1, `figure_2.jpeg` → Figure 2）。
+5. `meta.json` に各画像の表示幅（`width_pct`）が記録されているので、後のステップで参照する。
 
 #### pymupdf がインストールされていない場合
 
@@ -121,11 +142,12 @@ pdfimages -all "<PDFパス>" "<出力フォルダ>/images/figure"
 2. PDFを読んでセクション構造をMarkdown形式でファイルに出力する。セクション番号はPDFの番号に従うこと。
 3. セクションごとに「このセクションの内容をMarkdown形式に変換し、Markdownファイルの該当のセクションの部分に挿入する。段落ごとに空白行で区切ること。」というサブタスクを生成する。
 4. 生成したサブタスクを順番に実行する。
-5. **画像の埋め込み**: PDFで `Figure N:` として参照されている箇所に、Step 1.5 で抽出した対応画像をMarkdown画像記法で埋め込む：
+5. **画像の埋め込み**: PDFで `Figure N:` として参照されている箇所に、Step 1.5 で抽出した対応画像をMarkdown画像記法で埋め込む。`images/meta.json` から `width_pct` を読み取り、`{width=X%}` 属性を付与する：
    ```markdown
-   ![Figure 1: キャプション文](images/figure_1.jpeg)
+   ![Figure 1: キャプション文](images/figure_1.jpeg){width=70%}
    ```
    - 画像は必ずキャプション付きで挿入する。キャプションはPDFの原文に従う。
+   - `{width=X%}` は `meta.json` の値をそのまま使う。`meta.json` がない場合は `{width=80%}` をデフォルトとする。
    - 画像が抽出できなかった場合のみ `[Figure N: キャプション]` のプレースホルダーを使用する。
 6. 全てのセクションを1つずつ確認し、空白のセクションがないかを確認する。空白のセクションがあれば修正する。
 7. `pnpx markdownlint-cli2 <出力フォルダ>/paper.md` を実行してフォーマットをチェックし、エラーがあれば修正する。
@@ -138,7 +160,7 @@ pdfimages -all "<PDFパス>" "<出力フォルダ>/images/figure"
 4. 各セクションの本文だけを英語から日本語に翻訳する。
    - Markdownの構造（見出し階層、箇条書き、コードブロック、表）はそのまま維持する。
    - 表や図表キャプションも本文に含まれる場合は日本語に翻訳する。
-   - **画像参照はそのまま保持する**: `![Figure N: ...](images/figure_N.ext)` の行はそのまま維持する。キャプション部分のみ日本語に翻訳してもよい（例: `![図1: 日本語キャプション](images/figure_1.jpeg)`）。
+   - **画像参照はそのまま保持する**: `![Figure N: ...](images/figure_N.ext){width=X%}` の行はそのまま維持する（`{width=X%}` 属性も保持すること）。キャプション部分のみ日本語に翻訳してもよい（例: `![図1: 日本語キャプション](images/figure_1.jpeg){width=70%}`）。
 5. `<出力フォルダ>/paper.ja.md` として保存する。
 6. 全てのセクションを確認し、空欄や未翻訳の部分がないかチェックし修正する。
 7. `pnpx markdownlint-cli2 <出力フォルダ>/paper.ja.md` を実行してフォーマットをチェックし、エラーがあれば修正する。
