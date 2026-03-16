@@ -95,9 +95,9 @@ Launch Claude Code and run `/paper-translate`:
 |---|---|
 | Claude Code | Latest version |
 | Python | 3.10+ |
-| doclayout-yolo | Latest |
-| pdf2image | Latest |
-| poppler | Latest |
+| doclayout-yolo | 0.0.4+ |
+| pdf2image | 1.17.0+ |
+| poppler | 24.02.0+ |
 | pandoc | 2.x+ |
 | TeX engine | lualatex (recommended) or xelatex |
 | Japanese font | Yu Gothic (Win) / Hiragino (Mac) / Noto CJK (Linux) |

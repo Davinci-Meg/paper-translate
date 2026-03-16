@@ -96,9 +96,9 @@ Claude Code を起動して `/paper-translate` を実行：
 |---|---|
 | Claude Code | 最新版 |
 | Python | 3.10 以上 |
-| doclayout-yolo | 最新版 |
-| pdf2image | 最新版 |
-| poppler | 最新版 |
+| doclayout-yolo | 0.0.4+ |
+| pdf2image | 1.17.0+ |
+| poppler | 24.02.0+ |
 | pandoc | 2.x 以上 |
 | TeX エンジン | lualatex（推奨）または xelatex |
 | 日本語フォント | Yu Gothic (Win) / Hiragino (Mac) / Noto CJK (Linux) |
