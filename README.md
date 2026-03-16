@@ -1,6 +1,6 @@
 # :page_facing_up: paper-translator-en2ja
 
-英語論文（PDF）を日本語に翻訳・要約し、図版付きで出力する Claude Code スキル。
+英語論文（PDF）を日本語に翻訳し、図版付きで出力する Claude Code スキル。
 
 ![Claude Code](https://img.shields.io/badge/Claude_Code-Skill-blueviolet?logo=anthropic)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
